@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "VotingWizard"
+require "voting_wizard"
 
 RSpec.describe "PollMaster integration" do
   it "runs full poll flow" do

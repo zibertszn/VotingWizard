@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "VotingWizard"
+require "voting_wizard"
 
 RSpec.describe VotingWizard::Option do
   describe "#initialize" do

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "VotingWizard"
+require "voting_wizard"
 
 RSpec.describe VotingWizard do
   it "has a version number" do

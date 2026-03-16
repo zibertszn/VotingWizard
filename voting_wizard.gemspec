@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require_relative "lib/VotingWizard/version"
+require_relative "lib/voting_wizard/version"
 
 Gem::Specification.new do |spec|
-  spec.name = "VotingWizard"
+  spec.name = "voting_wizard"
   spec.version = VotingWizard::VERSION
   spec.authors = ["Roman", "Alexander"]
   spec.email = ["ramrost666@gmail.com", "alepon1337@mail.ru"]

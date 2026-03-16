@@ -1,5 +1,5 @@
 
-require "VotingWizard"
+require "voting_wizard"
 
 RSpec.describe VotingWizard::Poll do
   subject(:poll) { described_class.new("Favorite language?") }
