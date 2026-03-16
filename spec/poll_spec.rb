@@ -1,7 +1,7 @@
 
 require "VotingWizard"
 
-RSpec.describe PollMaster::Poll do
+RSpec.describe VotingWizard::Poll do
   subject(:poll) { described_class.new("Favorite language?") }
 
   describe "#initialize" do
@@ -31,7 +31,7 @@ RSpec.describe PollMaster::Poll do
       poll.add_option("Ruby")
 
       expect { poll.add_option("ruby") }
-        .to raise_error(PollMaster::DuplicateOptionError)
+        .to raise_error(VotingWizard::DuplicateOptionError)
     end
   end
 
@@ -54,21 +54,21 @@ RSpec.describe PollMaster::Poll do
 
     it "raises error if option does not exist" do
       expect { poll.vote(user: "Ivan", option: "Java") }
-        .to raise_error(PollMaster::OptionNotFoundError)
+        .to raise_error(VotingWizard::OptionNotFoundError)
     end
 
     it "raises error if user votes twice" do
       poll.vote(user: "Ivan", option: "Ruby")
 
       expect { poll.vote(user: "Ivan", option: "Python") }
-        .to raise_error(PollMaster::DuplicateVoteError)
+        .to raise_error(VotingWizard::DuplicateVoteError)
     end
 
     it "treats usernames case-insensitively" do
       poll.vote(user: "Ivan", option: "Ruby")
 
       expect { poll.vote(user: "ivan", option: "Python") }
-        .to raise_error(PollMaster::DuplicateVoteError)
+        .to raise_error(VotingWizard::DuplicateVoteError)
     end
   end
 
@@ -135,7 +135,7 @@ RSpec.describe PollMaster::Poll do
 
     it "raises error for unknown option" do
       expect { poll.percentage_for("Java") }
-        .to raise_error(PollMaster::OptionNotFoundError)
+        .to raise_error(VotingWizard::OptionNotFoundError)
     end
   end
 

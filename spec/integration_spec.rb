@@ -4,7 +4,7 @@ require "VotingWizard"
 
 RSpec.describe "PollMaster integration" do
   it "runs full poll flow" do
-    poll = PollMaster::Poll.new("Best backend language?")
+    poll = VotingWizard::Poll.new("Best backend language?")
     poll.add_option("Ruby")
     poll.add_option("Python")
     poll.add_option("Go")
