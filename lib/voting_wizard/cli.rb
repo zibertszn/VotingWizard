@@ -119,7 +119,7 @@ module VotingWizard
     def vote
       user = prompt("User name:")
       show_options
-      option = prompt("Vote for option:")
+      option = resolve_option_choice(prompt("Vote for option number or name:"))
       @poll.vote(user: user, option: option)
       @stdout.puts "Vote accepted for #{user.strip}."
     end
@@ -169,8 +169,8 @@ module VotingWizard
 
     def show_options
       @stdout.puts "Available options:"
-      @poll.options.each do |option|
-        @stdout.puts "- #{option.text}"
+      @poll.options.each_with_index do |option, index|
+        @stdout.puts "#{index + 1}. #{option.text}"
       end
     end
 
@@ -248,6 +248,19 @@ module VotingWizard
       text = value.to_s
       escaped = text.gsub('"', '""')
       %("#{escaped}")
+    end
+
+    def resolve_option_choice(choice)
+      return choice unless numeric_choice?(choice)
+
+      option = @poll.options[choice.to_i - 1]
+      raise OptionNotFoundError, "Option number '#{choice}' not found" unless option
+
+      option.text
+    end
+
+    def numeric_choice?(value)
+      value.match?(/\A\d+\z/)
     end
   end
 end

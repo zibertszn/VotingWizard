@@ -18,7 +18,7 @@ RSpec.describe VotingWizard::CLI do
 
         2
         Ivan
-        Ruby
+        1
         3
         4
         6
@@ -30,6 +30,26 @@ RSpec.describe VotingWizard::CLI do
       expect(stdout.string).to include("Results for: Favorite language?")
       expect(stdout.string).to include("- Ruby: 1 vote(s) (100.00%)")
       expect(stdout.string).to include("Winner: Ruby")
+      expect(stderr.string).to eq("")
+    end
+
+    it "still allows voting by option name" do
+      stdin = StringIO.new(<<~INPUT)
+        Favorite language?
+        Ruby
+        Python
+
+        2
+        Ivan
+        Python
+        3
+        6
+      INPUT
+
+      exit_code = described_class.new(stdin: stdin, stdout: stdout, stderr: stderr).run
+
+      expect(exit_code).to eq(0)
+      expect(stdout.string).to include("- Python: 1 vote(s) (100.00%)")
       expect(stderr.string).to eq("")
     end
 
