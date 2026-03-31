@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "optparse"
+require "json"
 
 module VotingWizard
   class CLI
@@ -9,8 +10,11 @@ module VotingWizard
       "2" => :vote,
       "3" => :show_results,
       "4" => :show_winner,
-      "5" => :exit_cli
+      "5" => :save_results,
+      "6" => :exit_cli
     }.freeze
+
+    SUPPORTED_EXPORT_FORMATS = %w[txt json csv].freeze
 
     def initialize(stdin: $stdin, stdout: $stdout, stderr: $stderr)
       @stdin = stdin
@@ -91,7 +95,7 @@ module VotingWizard
         action = MENU_ACTIONS[prompt("Choose an action:")]
 
         unless action
-          @stderr.puts "Unknown action. Please choose 1-5."
+          @stderr.puts "Unknown action. Please choose 1-6."
           next
         end
 
@@ -139,6 +143,19 @@ module VotingWizard
       end
     end
 
+    def save_results
+      path = prompt("File path for export:")
+      format = detect_format(path) || prompt("Format (txt/json/csv):").strip.downcase
+
+      validate_export_format!(format)
+      export_content = build_export_content(format)
+      File.write(path, export_content)
+
+      @stdout.puts "Results saved to #{path}"
+    rescue SystemCallError => e
+      @stderr.puts "Failed to save results: #{e.message}"
+    end
+
     def print_menu
       @stdout.puts
       @stdout.puts "Poll: #{@poll.question}"
@@ -146,7 +163,8 @@ module VotingWizard
       @stdout.puts "2. Vote"
       @stdout.puts "3. Show results"
       @stdout.puts "4. Show winner"
-      @stdout.puts "5. Exit"
+      @stdout.puts "5. Save results to file"
+      @stdout.puts "6. Exit"
     end
 
     def show_options
@@ -159,6 +177,77 @@ module VotingWizard
     def prompt(message)
       @stdout.puts message
       @stdin.gets&.chomp.to_s
+    end
+
+    def detect_format(path)
+      extension = File.extname(path).delete(".").downcase
+      extension unless extension.empty?
+    end
+
+    def validate_export_format!(format)
+      return if SUPPORTED_EXPORT_FORMATS.include?(format)
+
+      raise ArgumentError, "Unsupported export format '#{format}'. Supported formats: #{SUPPORTED_EXPORT_FORMATS.join(', ')}"
+    end
+
+    def build_export_content(format)
+      case format
+      when "txt" then build_text_export
+      when "json" then build_json_export
+      when "csv" then build_csv_export
+      end
+    end
+
+    def build_text_export
+      lines = []
+      lines << "Question: #{@poll.question}"
+      lines << "Total votes: #{@poll.total_votes}"
+      lines << "Winner: #{@poll.winner || 'No winner'}"
+      lines << "Results:"
+
+      @poll.results.each do |option, votes|
+        percentage = format("%.2f", @poll.percentage_for(option))
+        lines << "- #{option}: #{votes} vote(s) (#{percentage}%)"
+      end
+
+      lines.join("\n") + "\n"
+    end
+
+    def build_json_export
+      payload = {
+        question: @poll.question,
+        total_votes: @poll.total_votes,
+        winner: @poll.winner,
+        results: @poll.results.each_with_object({}) do |(option, votes), hash|
+          hash[option] = {
+            votes: votes,
+            percentage: @poll.percentage_for(option)
+          }
+        end
+      }
+
+      JSON.pretty_generate(payload) + "\n"
+    end
+
+    def build_csv_export
+      rows = []
+      rows << ["question", @poll.question]
+      rows << ["total_votes", @poll.total_votes]
+      rows << ["winner", @poll.winner]
+      rows << []
+      rows << ["option", "votes", "percentage"]
+
+      @poll.results.each do |option, votes|
+        rows << [option, votes, format("%.2f", @poll.percentage_for(option))]
+      end
+
+      rows.map { |row| row.map { |value| csv_cell(value) }.join(",") }.join("\n") + "\n"
+    end
+
+    def csv_cell(value)
+      text = value.to_s
+      escaped = text.gsub('"', '""')
+      %("#{escaped}")
     end
   end
 end
