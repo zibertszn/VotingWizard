@@ -1,43 +1,206 @@
 # VotingWizard
 
-TODO: Delete this and the text below, and describe your gem
+**VotingWizard** — это простая и удобная Ruby-библиотека (gem) для создания опросов и систем голосования.
+Она позволяет создавать опросы, добавлять варианты ответов, принимать голоса и вычислять результаты.
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/VotingWizard`. To experiment with that code, run `bin/console` for an interactive prompt.
+---
 
-## Installation
+## ✨ Возможности
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+* Создание опросов
+* Добавление вариантов ответа
+* Голосование пользователей
+* Защита от повторного голосования
+* Подсчёт результатов
+* Определение победителя
+* Расчёт процентов голосов
 
-Install the gem and add to the application's Gemfile by executing:
+---
 
-```bash
-bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+## 📦 Установка
+
+Добавьте в ваш `Gemfile`:
+
+```ruby
+gem "voting_wizard"
 ```
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+Затем выполните:
 
 ```bash
-gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+bundle install
 ```
 
-## Usage
+Или установите напрямую:
 
-TODO: Write usage instructions here
+```bash
+gem install voting_wizard
+```
 
-## Development
+---
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+## 🚀 Использование
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+```ruby
+require "voting_wizard"
 
-## Contributing
+poll = VotingWizard::Poll.new("Любимый язык программирования?")
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/VotingWizard. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/VotingWizard/blob/master/CODE_OF_CONDUCT.md).
+poll.add_option("Ruby")
+poll.add_option("Python")
+poll.add_option("Go")
 
-## License
+poll.vote(user: "Ivan", option: "Ruby")
+poll.vote(user: "Maria", option: "Python")
+poll.vote(user: "Alex", option: "Ruby")
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+puts poll.results
+# => { "Ruby" => 2, "Python" => 1, "Go" => 0 }
 
-## Code of Conduct
+puts poll.winner
+# => "Ruby"
 
-Everyone interacting in the VotingWizard project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/VotingWizard/blob/master/CODE_OF_CONDUCT.md).
+puts poll.percentage_for("Ruby")
+# => 66.67
+```
+
+---
+
+## 💻 CLI
+
+После установки gem можно запустить интерактивный режим:
+
+```bash
+voting_wizard
+```
+
+Или сразу передать вопрос и варианты через аргументы:
+
+```bash
+voting_wizard --question "Favorite language?" --option Ruby --option Python --option Go
+```
+
+В CLI доступны действия:
+
+* добавление нового варианта
+* голосование пользователя
+* просмотр результатов
+* просмотр победителя
+* сохранение результатов в `txt`, `json` или `csv`
+* выход из программы
+
+Пример сохранения результатов:
+
+1. выберите пункт `5` в меню
+2. укажите путь, например `results.json` или `results.csv`
+3. CLI сохранит текущие результаты голосования в файл
+
+---
+
+## 📚 API
+
+### Создание опроса
+
+```ruby
+poll = VotingWizard::Poll.new("Вопрос?")
+```
+
+---
+
+### Добавление вариантов
+
+```ruby
+poll.add_option("Вариант 1")
+poll.add_option("Вариант 2")
+```
+
+---
+
+### Голосование
+
+```ruby
+poll.vote(user: "username", option: "Вариант 1")
+```
+
+---
+
+### Получение результатов
+
+```ruby
+poll.results
+# => { "Вариант 1" => 2, "Вариант 2" => 1 }
+```
+
+---
+
+### Определение победителя
+
+```ruby
+poll.winner
+# => "Вариант 1"
+```
+
+---
+
+### Процент голосов
+
+```ruby
+poll.percentage_for("Вариант 1")
+# => 66.67
+```
+
+---
+
+### Общее количество голосов
+
+```ruby
+poll.total_votes
+```
+
+---
+
+## ⚠️ Обработка ошибок
+
+Библиотека выбрасывает ошибки в следующих случаях:
+
+* `VotingWizard::DuplicateOptionError` — вариант уже существует
+* `VotingWizard::DuplicateVoteError` — пользователь уже голосовал
+* `VotingWizard::OptionNotFoundError` — вариант не найден
+* `VotingWizard::InvalidOptionError` — некорректный вариант
+* `VotingWizard::InvalidUserError` — некорректный пользователь
+
+---
+
+## 🧪 Запуск тестов
+
+```bash
+bundle exec rspec
+```
+
+---
+
+## ⚙️ CI/CD
+
+Проект использует GitHub Actions для автоматического запуска тестов при каждом `push` и `pull request`.
+
+---
+
+## 📁 Структура проекта
+
+```text
+lib/
+  voting_wizard.rb
+  voting_wizard/
+    poll.rb
+    option.rb
+    vote.rb
+    error.rb
+spec/
+```
+
+---
+
+
+## 📄 Лицензия
+
+Проект распространяется под лицензией MIT.
