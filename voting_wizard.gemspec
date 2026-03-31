@@ -20,10 +20,10 @@ Gem::Specification.new do |spec|
   spec.metadata["source_code_uri"] = "https://github.com/zibertszn/VotingWizard"
 
   spec.files = Dir.chdir(__dir__) do
-    Dir["lib/**/*", "README.md", "LICENSE.txt"]
+    Dir["lib/**/*", "exe/*", "README.md", "LICENSE.txt"]
   end
 
   spec.bindir = "exe"
-  spec.executables = []
+  spec.executables = ["voting_wizard"]
   spec.require_paths = ["lib"]
 end
